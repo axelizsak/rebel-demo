@@ -2,7 +2,7 @@
 
 1. The archetype: which of the five kinds of customer this is, guessed like the game Akinator. The code keeps a
    probability for each archetype, asks next the question that separates them best, and updates the probabilities
-   with every answer (Bayes' rule). What Belfius already knows (age, savings, investments) sets the start and
+   with every answer (Bayes' rule). What the bank already knows (age, savings, investments) sets the start and
    sharpens the wording. The archetype decides how the coach helps, never an asset.
 2. The strategy (Defensive, Balanced or Opportunity): the customer's risk level, set by fixed rules on the
    suitability answers (`strategy`), never by the model nor by the archetype. It decides the reference portfolio shown
@@ -31,24 +31,24 @@ NOISE = 0.10  # weight of "any answer could come from any archetype", so one odd
 CONFIDENT = 0.80  # no further question is added once one archetype is this likely
 MAX_QUESTIONS = 7  # the chat never asks more, the customer's rules included
 # Asked to every customer, the least a suitability check needs: the goal, the horizon, the amount, the reaction to
-# a loss and one knowledge question. The wealth range is asked too when Belfius does not show the savings.
+# a loss and one knowledge question. The wealth range is asked too when the bank does not show the savings.
 ALWAYS = ["goal", "horizon", "amount", "loss_reaction", "knowledge_1"]
 MESSAGE_CHARS = 400  # a typed reply is cut to this length
 # The contradictions the code looks for (ESMA suitability guidelines: consistency checks).
 HIGH_LOSS_PCT = 20  # accepting a one-year loss this large is a high-risk answer
 WEALTH_CEILING = {"under_10k": 10_000, "10k_50k": 50_000, "50k_250k": 250_000}  # EUR, the top of each wealth range
 
-# What Belfius data says before any question. answer -> (in words, how likely each archetype is to show it, in ORDER).
+# What the bank's data says before any question. answer -> (in words, how likely each archetype is to show it, in ORDER).
 OBSERVED = {
     "age": {"name": "Age", "answers": {
         "18_24": ("18 to 24", [.80, .08, .10, .02, .01]), "25_34": ("25 to 34", [.17, .70, .55, .28, .02]),
         "35_44": ("35 to 44", [.02, .20, .30, .60, .12]), "45_plus": ("45 or older", [.01, .02, .05, .10, .85])}},
-    "savings": {"name": "Savings at Belfius", "answers": {
+    "savings": {"name": "Savings at the bank", "answers": {
         "under_5k": ("under EUR 5,000", [.85, .30, .25, .10, .03]),
         "5k_20k": ("EUR 5,000 to 20,000", [.13, .55, .50, .45, .17]),
         "20k_40k": ("EUR 20,000 to 40,000", [.01, .12, .18, .35, .35]),
         "over_40k": ("over EUR 40,000", [.01, .03, .07, .10, .45])}},
-    "invested": {"name": "Investments at Belfius", "answers": {
+    "invested": {"name": "Investments at the bank", "answers": {
         "none": ("none", [.95, .65, .75, .95, .50]), "some": ("some", [.05, .35, .25, .05, .50])}},
 }
 # The questions. kind: choice (one answer), amount (a number in EUR, read in bands) or rules (several answers, no
@@ -200,8 +200,8 @@ def band(question: str, value) -> str:
 
 
 def observed(customer: dict, consent: bool) -> dict[str, str]:
-    """What Belfius data says about the customer, as answers of OBSERVED: the age in any case, the account data
-    only if they agreed and Belfius has it."""
+    """What the bank's data says about the customer, as answers of OBSERVED: the age in any case, the account data
+    only if they agreed and the bank has it."""
     age = customer["age"]
     seen = {"age": "18_24" if age < 25 else "25_34" if age < 35 else "35_44" if age < 45 else "45_plus"}
     savings = customer.get("savings_eur") if consent else None
@@ -230,7 +230,7 @@ def clean(answers: dict | None) -> dict:
 
 
 def odds(seen: dict[str, str], answers: dict) -> list[float]:
-    """The probability of each archetype, in ORDER, after what Belfius data shows and the answers given (Bayes)."""
+    """The probability of each archetype, in ORDER, after what the bank's data shows and the answers given (Bayes)."""
     logs = [math.log(p) for p in PRIOR]
     evidence = {**seen, **{q: band(q, v) for q, v in answers.items() if q in TABLES}}
     for name, answer in evidence.items():
@@ -254,7 +254,7 @@ def gain(question: str, now: list[float]) -> float:
 
 
 def required(seen: dict[str, str]) -> list[str]:
-    """The questions this customer is asked in any case: ALWAYS, and the wealth range when Belfius has no savings
+    """The questions this customer is asked in any case: ALWAYS, and the wealth range when the bank has no savings
     to show for it."""
     return ALWAYS + ([] if "savings" in seen else ["wealth"])
 
@@ -273,7 +273,7 @@ def next_question(seen: dict[str, str], answers: dict) -> str | None:
 
 
 def wording(question: str, customer: dict, consent: bool, answers: dict) -> tuple[str, list[int]]:
-    """What Bel says for a question, with the customer's own figures where Belfius has them, and the amounts
+    """What the coach says for a question, with the customer's own figures where the bank has them, and the amounts
     offered to tap for an amount question."""
     savings = customer.get("savings_eur") if consent else None
     investments = customer.get("investments") if consent else None
@@ -291,7 +291,7 @@ def wording(question: str, customer: dict, consent: bool, answers: dict) -> tupl
     if question == "wealth":
         if savings:
             held = f"{eur(savings)} in savings" + (f" and a {investments}" if holds else "")
-            return (f"At Belfius I see {held}. Counting what you hold elsewhere, your home aside, which range are "
+            return (f"On your accounts I see {held}. Counting what you hold elsewhere, your home aside, which range are "
                     "you in?"), []
         return "All your savings and investments together, your home aside: which range are you in?", []
     if question == "monthly":
@@ -310,7 +310,7 @@ def wording(question: str, customer: dict, consent: bool, answers: dict) -> tupl
         return opening + ("Which is usually less risky?" if question == "knowledge_1"
                           else "Which usually goes up and down more?"), []
     if question == "experience":
-        return (f"I see a {investments} at Belfius. " if holds else "") + "What is the riskiest thing you have invested in so far?", []
+        return (f"I see a {investments} on your accounts. " if holds else "") + "What is the riskiest thing you have invested in so far?", []
     if question == "involvement":
         return "How hands-on do you want to be?", []
     if question == "worry":
@@ -497,7 +497,7 @@ def read(question: str, text: str, client=None) -> dict:
 def step(customer: dict, consent: bool, answers: dict | None = None, reply: dict | None = None, client=None) -> dict:
     """One turn of the chat.
 
-    customer: what Belfius knows (mobile/customers.py); consent: whether Bel may use the account data.
+    customer: what the bank knows (mobile/customers.py); consent: whether the coach may use the account data.
     answers: the answers so far, {question: answer}. reply: the customer's reply to the question just asked,
     {"question": ..., "value": the answer tapped} or {"question": ..., "text": what they typed}.
     Returns what Lena says, the next question (None once the chat is over), the answers, the probability of each
@@ -526,7 +526,7 @@ def step(customer: dict, consent: bool, answers: dict | None = None, reply: dict
             said += [f"Noted. {flag}: an adviser will look at your plan with you first."
                      for flag in checks(answers) if flag not in before]
     elif not answers:
-        said.append(f"Hi {customer['first_name']}, I'm {COACH}, the AI inside ReBel. A few questions, about three "
+        said.append(f"Hi {customer['first_name']}, I'm {COACH}, the AI inside Rheindata. A few questions, about three "
                     "minutes: your answers set your risk level, and I show you its model portfolio, the same for "
                     "everyone at that level. You decide what you buy.")
     now = odds(seen, answers)

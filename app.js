@@ -1,7 +1,7 @@
-// ReBel customer app: one phone. Welcome, consent, chat with Lena, the result (risk level and style), then the app
+// Rheindata customer app: one phone. Welcome, consent, chat with Lena, the result (risk level and style), then the app
 // itself in three tabs (Portfolio, Explore, Learn) and the sheet of each ETF.
 // The server holds the logic (mobile/server.py, mobile/wallet.py); this file shows it and sends what the customer does.
-// ReBel is execution-only: the app informs, the customer places every order.
+// Rheindata is execution-only: the app informs, the customer places every order.
 
 const eur = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const eur2 = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -222,7 +222,7 @@ function renderWelcome() {
   const back = Boolean(state.strategy);
   $("view-welcome").replaceChildren(
     h("div", { class: "welcome-top" },
-      h("p", { class: "wordmark" }, "ReBel"),
+      h("p", { class: "wordmark" }, "Rheindata"),
       h("h2", { class: "display welcome-title" },
         ...(back ? ["Welcome back, ", h("em", {}, `${c.first_name}.`)] : ["Investing, ", h("em", {}, "explained.")])),
       h("p", { class: "welcome-sub" }, back
@@ -234,7 +234,7 @@ function renderWelcome() {
       h("div", { class: "signed" }, avatar(c),
         h("div", {}, h("b", {}, `${c.first_name}, ${c.age}`), h("small", {}, `Signed in · ${c.city}`))),
       h("button", { class: "btn btn-primary", type: "button", onclick: back ? () => openMain(state.orders.length ? "portfolio" : "explore") : () => go("consent") },
-        back ? "Open ReBel" : "Get started")));
+        back ? "Open Rheindata" : "Get started")));
 }
 
 // ---- Consent ------------------------------------------------------------------------------------------------
@@ -244,10 +244,10 @@ function renderConsent() {
     h("div", { class: "topbar" }, h("button", { class: "icon-btn", type: "button", "aria-label": "Back", icon: ICON.back, onclick: () => go("welcome") })),
     h("div", { class: "pad scroll" },
       h("h2", { class: "display screen-title" }, "Skip what we already know."),
-      h("p", { class: "lead" }, `With your OK, ${state.coach} reads these five things from your Belfius accounts and only asks what is missing.`),
+      h("p", { class: "lead" }, `With your OK, ${state.coach} reads these five things from your bank accounts and only asks what is missing.`),
       h("ul", { class: "data-list" }, items),
       h("p", { class: "notice" }, h("span", { icon: ICON.person }),
-        `${state.coach} is an AI. A Belfius adviser is one tap away, at any time.`)),
+        `${state.coach} is an AI. A bank adviser is one tap away, at any time.`)),
     h("div", { class: "footer" },
       h("button", { class: "btn btn-primary", type: "button", onclick: () => startChat(true) }, "Use my data"),
       h("button", { class: "btn btn-text", type: "button", onclick: () => startChat(false) }, "I'd rather answer myself")));
@@ -257,7 +257,7 @@ function renderConsent() {
 function renderChat() {
   $("view-chat").replaceChildren(
     h("div", { class: "chat-head" }, h("div", { class: "orb" }),
-      h("div", { class: "grow" }, h("b", {}, state.coach), h("small", {}, "AI · ReBel")),
+      h("div", { class: "grow" }, h("b", {}, state.coach), h("small", {}, "AI · Rheindata")),
       h("button", { class: "pill", type: "button", onclick: adviserSheet }, "Adviser")),
     h("div", { class: "progress" }, h("i", { id: "progress" })),
     h("div", { class: "messages", id: "messages", "aria-live": "polite" }),
@@ -353,24 +353,24 @@ async function turn(reply) {
 
 function adviserSheet() {
   openSheet(h("h3", {}, "Talk to a person"),
-    h("p", {}, `A Belfius adviser can take over at any point, with what you already told ${state.coach}, so you never start again.`),
+    h("p", {}, `A bank adviser can take over at any point, with what you already told ${state.coach}, so you never start again.`),
     h("p", {}, "This is a prototype: no call is placed."),
     h("button", { class: "btn btn-ghost", type: "button", onclick: closeSheet }, "Close"));
 }
 
-/** ReBel is execution-only. Who wants someone else to decide is sent to Belfius: advice or a managed portfolio. */
+/** Rheindata is execution-only. Who wants someone else to decide is sent to the bank: advice or a managed portfolio. */
 function handoffSheet() {
   openSheet(h("h3", {}, "Rather have someone decide?"),
-    h("p", {}, "In ReBel you decide and place each order yourself. If you would rather not, Belfius can take over:"),
+    h("p", {}, "In Rheindata you decide and place each order yourself. If you would rather not, the bank can take over:"),
     h("div", { class: "options" },
-      h("div", { class: "option" }, h("b", {}, "Belfius advises, you decide"), h("small", {}, "An adviser proposes, you approve each move. MyPortfolio, funds.")),
-      h("div", { class: "option" }, h("b", {}, "Belfius manages it for you"), h("small", {}, "A managed portfolio: Belfius decides within your risk level, for a fee."))),
+      h("div", { class: "option" }, h("b", {}, "The bank advises, you decide"), h("small", {}, "An adviser proposes, you approve each move. Funds and portfolios.")),
+      h("div", { class: "option" }, h("b", {}, "The bank manages it for you"), h("small", {}, "A managed portfolio: the bank decides within your risk level, for a fee."))),
     h("p", {}, `What you told ${state.coach} goes with you, so you never start again. This is a prototype: nothing is sent.`),
     h("button", { class: "btn btn-ghost", type: "button", onclick: closeSheet }, "Close"));
 }
 const handoffCard = () => h("button", { class: "handoff", type: "button", onclick: handoffSheet },
   h("span", { class: "handoff-icon", icon: ICON.person }),
-  h("span", { class: "grow" }, h("b", {}, "Rather have someone decide for you?"), h("small", {}, "Belfius advice or a managed portfolio")), h("span", { class: "chev" }, "›"));
+  h("span", { class: "grow" }, h("b", {}, "Rather have someone decide for you?"), h("small", {}, "Bank advice or a managed portfolio")), h("span", { class: "chev" }, "›"));
 
 // ---- Result: risk level and style ----------------------------------------------------------------------------
 const levelDots = (level) => h("span", { class: "dots", "aria-label": `level ${level} of 3` }, [1, 2, 3].map((n) => h("i", { class: n <= level ? "is-on" : "" })));
@@ -490,7 +490,7 @@ function exploreTab() {
       h("button", { class: "btn btn-primary", type: "button", onclick: basketSheet, disabled: !open.length }, "Buy this mix myself"),
       note(`${NOT_ADVICE}${locked.length ? ` ${locked.length} locked ETF${locked.length > 1 ? "s are" : " is"} left out.` : ""}`)),
     h("div", { class: "section" }, handoffCard()),
-    section("All ETFs", note("The whole ReBel selection: open one to see what our AI reads in it."),
+    section("All ETFs", note("The whole Rheindata selection: open one to see what our AI reads in it."),
       ...groups.map((g) => h("div", { class: "group" }, h("p", { class: "group-name" }, g.theme),
         h("div", { class: "lines" }, g.items.map(catalogueRow))))));
 }
@@ -718,7 +718,7 @@ function buySheet(etf, line, sheet) {
   openSheet(h("h3", {}, `Buy ${etf.ticker}`), h("p", {}, sheet.name || etf.name || ""),
     h("label", { class: "amount-field" }, h("span", {}, "€"), input), units,
     h("div", { class: "quick" }, [100, 250, 500, 1000].map((v) => h("button", { class: "chip", type: "button", onclick: () => { input.value = String(v); update(); } }, eur.format(v)))),
-    error, h("p", { class: "fine" }, `You decide. ReBel places your order, it does not advise you.`),
+    error, h("p", { class: "fine" }, `You decide. Rheindata places your order, it does not advise you.`),
     h("div", { class: "stack" }, place, h("button", { class: "btn btn-text", type: "button", onclick: closeSheet }, "Cancel")));
 }
 
@@ -788,7 +788,7 @@ function ordersSheet(title, intro, orders, footnote = null) {
   openSheet(h("h3", {}, title), h("p", {}, intro), h("div", { class: "basket" }, rows), footnote,
     h("div", { class: "basket-total" }, h("span", {}, "Buys"), buys),
     anySell ? h("div", { class: "basket-total" }, h("span", {}, "Sales"), sells) : null, error,
-    h("p", { class: "fine" }, "You decide. ReBel places your orders at the next close, it does not advise you."),
+    h("p", { class: "fine" }, "You decide. Rheindata places your orders at the next close, it does not advise you."),
     h("div", { class: "stack" }, place, h("button", { class: "btn btn-text", type: "button", onclick: closeSheet }, "Cancel")));
 }
 
@@ -823,7 +823,7 @@ function sellSheet(etf, holding) {
     h("label", { class: "amount-field" }, h("span", {}, "€"), input),
     h("div", { class: "quick" }, [0.25, 0.5, 1].map((part) => h("button", { class: "chip", type: "button",
       onclick: () => { input.value = String(Math.floor(holding.value * part * 100) / 100); } }, part === 1 ? "All" : `${part * 100}%`))),
-    error, h("p", { class: "fine" }, "You decide. ReBel places your order, it does not advise you."),
+    error, h("p", { class: "fine" }, "You decide. Rheindata places your order, it does not advise you."),
     h("div", { class: "stack" }, place, h("button", { class: "btn btn-text", type: "button", onclick: closeSheet }, "Cancel")));
 }
 
@@ -942,7 +942,7 @@ async function selectCustomer(id) {
   run += 1;
   const { state: saved, known } = await api(`/api/state?customer=${id}`);
   Object.assign(state, blank(), { id, known }, saved ? { ...saved, left: 0 } : {});
-  try { localStorage.setItem("rebel.customer", id); } catch { /* private window: the choice is not kept */ }
+  try { localStorage.setItem("rheindata.customer", id); } catch { /* private window: the choice is not kept */ }
   renderWelcome();
   renderConsent();
   go("welcome");
@@ -960,7 +960,7 @@ async function boot() {
     questions: start.questions, accountData: start.account_data, coach: start.coach, sleeves: start.sleeves, quiz: start.quiz,
     lessonBook: start.lessons, coreEtfs: start.core_etfs });
   let last = null;
-  try { last = localStorage.getItem("rebel.customer"); } catch { /* private window */ }
+  try { last = localStorage.getItem("rheindata.customer"); } catch { /* private window */ }
   await selectCustomer(state.customers.some((c) => c.id === last) ? last : state.customers[0].id);
   const tick = () => { $("clock").textContent = new Date().toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit" }); };
   tick();

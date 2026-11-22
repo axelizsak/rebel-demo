@@ -1,4 +1,4 @@
-"""Synthetic customers for the demo: what Belfius would know about each one. No real person and no real data."""
+"""Synthetic customers for the demo: what the bank would know about each one. No real person and no real data."""
 
 CUSTOMERS = {
     "lina": {"first_name": "Lina", "age": 21, "country": "Belgium", "city": "Ghent",
@@ -7,7 +7,7 @@ CUSTOMERS = {
     "thomas": {"first_name": "Thomas", "age": 29, "country": "Belgium", "city": "Brussels",
                "status": "employed, renting", "net_income_eur": 2_900, "savings_eur": 14_500,
                "loans": "car loan, EUR 180 a month", "investments": "pension savings fund, EUR 4,200"},
-    "noah": {"first_name": "Noah", "age": 33, "country": "Belgium", "city": "Antwerp",  # new: Belfius knows little
+    "noah": {"first_name": "Noah", "age": 33, "country": "Belgium", "city": "Antwerp",  # new: the bank knows little
              "status": "customer since last month", "net_income_eur": None, "savings_eur": 2_500,
              "loans": None, "investments": None},
     "sofie": {"first_name": "Sofie", "age": 38, "country": "Belgium", "city": "Leuven",
@@ -25,7 +25,7 @@ ACCOUNT = {"status": "Situation", "net_income_eur": "Net income a month", "savin
 
 def known(customer: str, consent: bool) -> dict[str, str]:
     """What the coach may use about a customer, as {label: value}: the basics, plus the account data on consent.
-    Account data Belfius does not have reads "not known"; without consent it all reads "not shared"."""
+    Account data the bank does not have reads "not known"; without consent it all reads "not shared"."""
     record = CUSTOMERS[customer]
 
     def shown(key: str) -> str:

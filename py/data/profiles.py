@@ -7,7 +7,7 @@
   is the kind of customer. The coach guesses it from the answers. It decides HOW: what the coach helps with first
   and the tips it gives. It never decides an asset.
 
-ReBel is execution-only: a reference portfolio is information, the customer
+Rheindata is execution-only: a reference portfolio is information, the customer
 places each order. A strategy's reference portfolio is fixed: a share per sleeve (SLEEVES), the same ETFs in the core
 sleeves for everyone (SLEEVE_ETFS), the strategy's own themes in the satellites. The numbers are the team's proposal,
 to challenge with backtest/README.md, section 7.

@@ -1,6 +1,6 @@
 """What a customer may buy, and what they hold: plain rules on plain data.
 
-ReBel is execution-only: the customer places every order. These rules only say what is open to them (their strategy,
+Rheindata is execution-only: the customer places every order. These rules only say what is open to them (their strategy,
 the check on complex products, their own rules) and compare what they hold with their strategy's reference portfolio.
 The comparison points to kinds of assets, never to an order.
 
